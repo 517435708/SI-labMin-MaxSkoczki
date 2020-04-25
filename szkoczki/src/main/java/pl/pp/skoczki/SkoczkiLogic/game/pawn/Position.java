@@ -1,7 +1,6 @@
-package pl.pp.skoczki.SkoczkiLogic;
+package pl.pp.skoczki.SkoczkiLogic.game.pawn;
 
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.util.ArrayList;

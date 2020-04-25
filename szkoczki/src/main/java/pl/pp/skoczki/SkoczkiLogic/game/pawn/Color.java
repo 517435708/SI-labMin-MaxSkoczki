@@ -1,4 +1,4 @@
-package pl.pp.skoczki.SkoczkiLogic;
+package pl.pp.skoczki.SkoczkiLogic.game.pawn;
 
 
 public enum Color {
