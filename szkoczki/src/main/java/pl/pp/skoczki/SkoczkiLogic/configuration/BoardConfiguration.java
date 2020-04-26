@@ -9,9 +9,13 @@ import javafx.scene.control.ToolBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
+import javafx.scene.shape.Rectangle;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import pl.pp.skoczki.SkoczkiLogic.game.board.MoveArbiter;
+import pl.pp.skoczki.SkoczkiLogic.game.pawn.Color;
 import pl.pp.skoczki.SkoczkiLogic.game.pawn.Pawn;
 import pl.pp.skoczki.SkoczkiLogic.game.pawn.Position;
 
@@ -23,10 +27,10 @@ import java.util.List;
 import static pl.pp.skoczki.SkoczkiLogic.configuration.ConfigConstants.*;
 
 @Configuration
-@DependsOn("pawnList")
+@DependsOn("normalPawnList")
 public class BoardConfiguration {
 
-    @Resource(name = "pawnList")
+    @Resource(name = "normalPawnList")
     private List<Pawn> pawns;
 
     @Bean(name = "chessBoard")
@@ -52,6 +56,7 @@ public class BoardConfiguration {
 
         return imageView;
     }
+
 
     private Group board() throws
                           FileNotFoundException {
@@ -110,7 +115,14 @@ public class BoardConfiguration {
         return images;
     }
 
-    private ToolBar generateToolBar() {
+    @Bean("turnImage")
+    public ImageView turnImage() throws
+                                   FileNotFoundException {
+        return new ImageView();
+    }
+
+    private ToolBar generateToolBar() throws
+                                      FileNotFoundException {
         ToolBar toolBar = new ToolBar();
 
         toolBar.setMinWidth(TOOLBAR_WIDTH);
@@ -129,10 +141,23 @@ public class BoardConfiguration {
         toolBar.getItems()
                .add(siVsHuman);
 
-        Label turn = new Label("Whose turn\n is this: ");
+        Label turn = new Label("Whose turn is this: ");
         toolBar.getItems()
                .add(turn);
 
+        ImageView imageBuffer = turnImage();
+
+        StackPane imageContainer = new StackPane();
+
+        Rectangle rectangle = new Rectangle();
+        rectangle.setWidth(IMAGE_WIDTH + 10);
+        rectangle.setHeight(IMAGE_WIDTH + 10);
+        rectangle.setFill(javafx.scene.paint.Color.BROWN);
+        rectangle.setStroke(javafx.scene.paint.Color.BROWN);
+
+        imageContainer.getChildren().addAll(rectangle, imageBuffer);
+
+        toolBar.getItems().add(imageContainer);
         toolBar.setOrientation(Orientation.VERTICAL);
         return toolBar;
     }

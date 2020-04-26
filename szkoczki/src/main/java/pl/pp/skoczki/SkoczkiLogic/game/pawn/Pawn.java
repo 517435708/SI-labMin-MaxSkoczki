@@ -15,8 +15,25 @@ public class Pawn {
 
     private boolean selected = false;
 
+    public Pawn(Pawn pawn) {
+        this.color = pawn.getColor();
+        this.position = pawn.getPosition();
+    }
+
     public Pawn(Color color, Position position) {
         this.color = color;
         this.position = position;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        Pawn pawn = (Pawn) obj;
+        return this.color.equals(pawn.color) && this.position.equals(pawn.position);
+    }
+
+    @Override
+    public int hashCode() {
+        return color.hashCode()*(position.hashCode() + 1) + position.hashCode();
+    }
+
 }

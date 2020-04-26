@@ -5,59 +5,35 @@ import javafx.scene.input.MouseEvent;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import pl.pp.skoczki.SkoczkiLogic.game.GameController;
-import pl.pp.skoczki.SkoczkiLogic.game.board.Board;
-import pl.pp.skoczki.SkoczkiLogic.game.pawn.Color;
+import pl.pp.skoczki.SkoczkiLogic.game.board.GameBoard;
 import pl.pp.skoczki.SkoczkiLogic.game.pawn.Pawn;
-import pl.pp.skoczki.SkoczkiLogic.game.pawn.Position;
 
 import javax.annotation.Resource;
+
 import java.util.List;
-import java.util.Optional;
 
 @Configuration
 public class GameControllerConfiguration {
 
-    @Resource(name = "pawnList")
+    @Resource(name = "normalPawnList")
     List<Pawn> pawns;
 
-    private Board board;
+    private GameBoard gameBoard;
     private ImageIoCContainer ioCContainer;
 
     GameControllerConfiguration(ImageIoCContainer ioCContainer,
-                                Board board) {
+                                GameBoard gameBoard) {
         this.ioCContainer = ioCContainer;
-        this.board = board;
+        this.gameBoard = gameBoard;
     }
 
     @Bean
     GameController gameController() {
 
-        GameController gameController = new GameController(board, pawns);
+        GameController gameController = new GameController(gameBoard, pawns);
         registerOnClickMethodForPawns(gameController);
-        registerOnClickMethodForPositions(gameController);
 
         return gameController;
-    }
-
-    private void registerOnClickMethodForPositions(GameController gameController) {
-        for (var position : Position.values()) {
-            ImageView imageViewPosition = position.getImageViewPosition();
-
-            imageViewPosition.setOnMouseClicked((MouseEvent event) -> {
-                if (imageViewPosition.isVisible()) {
-                    Optional<Pawn> optionalPaw = gameController.getSelectedPawn();
-                    optionalPaw.ifPresent(pawn -> {
-                        gameController.swapColors();
-                        Color winning = gameController.move(pawn, position);
-                        if (winning != Color.NONE) {
-                            System.out.println("Wygrywa: " + winning);
-                        }
-                    });
-                }
-
-                ioCContainer.resetSelections();
-            });
-        }
     }
 
     private void registerOnClickMethodForPawns(GameController gameController) {

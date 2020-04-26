@@ -3,8 +3,7 @@ package pl.pp.skoczki.SkoczkiLogic.game;
 
 import javafx.scene.image.ImageView;
 import lombok.Getter;
-import org.springframework.stereotype.Component;
-import pl.pp.skoczki.SkoczkiLogic.game.board.Board;
+import pl.pp.skoczki.SkoczkiLogic.game.board.GameBoard;
 import pl.pp.skoczki.SkoczkiLogic.game.pawn.Color;
 import pl.pp.skoczki.SkoczkiLogic.game.pawn.Pawn;
 import pl.pp.skoczki.SkoczkiLogic.game.pawn.Position;
@@ -22,11 +21,11 @@ public class GameController {
 
     @Getter
     private Color colorWhoseMoveIsThis = Color.WHITE;
-    private Board board;
+    private GameBoard gameBoard;
 
-    public GameController(Board board,
+    public GameController(GameBoard gameBoard,
                           List<Pawn> pawns) {
-        this.board = board;
+        this.gameBoard = gameBoard;
         this.pawns = pawns;
     }
 
@@ -38,21 +37,24 @@ public class GameController {
     }
 
     public List<Position> getPositionsForPawn(Pawn pawn) {
-        return board.returnPossibleMovesForPawn(pawn);
+        return gameBoard.returnPossibleMovesForPawn(pawn);
     }
 
-    public Color move(Pawn pawn, Position position) {
+    public Color move(Pawn reference, Position position) {
+
+        Pawn pawn = pawns.stream().filter(p -> p.equals(reference)).findFirst().orElseThrow();
+
         pawn.setPosition(position);
         ImageView imageView = pawn.getPawnImage();
 
         imageView.setX(position.getX() * IMAGE_WIDTH);
         imageView.setY(position.getY() * IMAGE_WIDTH);
 
-        if (board.getWinningColor() != Color.NONE) {
+        if (gameBoard.getWinningColor() != Color.NONE) {
             colorWhoseMoveIsThis = Color.NONE;
         }
 
-        return board.getWinningColor();
+        return gameBoard.getWinningColor();
     }
 
     public Optional<Pawn> getSelectedPawn() {
