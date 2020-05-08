@@ -1,11 +1,18 @@
 package pl.pp.skoczki.SkoczkiLogic.game.pawn;
 
 
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import lombok.Getter;
+import lombok.SneakyThrows;
 
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import static pl.pp.skoczki.SkoczkiLogic.configuration.ConfigConstants.IMAGE_WIDTH;
+import static pl.pp.skoczki.SkoczkiLogic.configuration.ConfigConstants.RESOURCE_PATH;
 
 @Getter
 public enum Position {
@@ -78,9 +85,16 @@ public enum Position {
     private int x;
     private int y;
 
+    private ImageView imageViewPosition;
+
+    @SneakyThrows
     Position(int x, int y) {
         this.x = x;
         this.y = y;
+        imageViewPosition =  new ImageView(new Image(new FileInputStream(RESOURCE_PATH + "possiblemove.png")));
+        imageViewPosition.setX(x * IMAGE_WIDTH);
+        imageViewPosition.setY(y * IMAGE_WIDTH);
+        imageViewPosition.setVisible(false);
     }
 
     public static Optional<Position> intToPosition(int x, int y) {

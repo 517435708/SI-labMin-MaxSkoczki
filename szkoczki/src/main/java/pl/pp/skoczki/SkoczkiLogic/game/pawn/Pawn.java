@@ -1,17 +1,22 @@
 package pl.pp.skoczki.SkoczkiLogic.game.pawn;
 
 
-import lombok.AllArgsConstructor;
+import javafx.scene.image.ImageView;
 import lombok.Getter;
 import lombok.Setter;
-import pl.pp.skoczki.SkoczkiLogic.game.pawn.Color;
-import pl.pp.skoczki.SkoczkiLogic.game.pawn.Position;
+
 
 @Getter
 @Setter
-@AllArgsConstructor
-public
-class Pawn {
+public class Pawn {
     private Color color;
     private Position position;
+    private ImageView pawnImage;
+
+    private boolean selected = false;
+
+    public Pawn(Color color, Position position) {
+        this.color = color;
+        this.position = position;
+    }
 }
