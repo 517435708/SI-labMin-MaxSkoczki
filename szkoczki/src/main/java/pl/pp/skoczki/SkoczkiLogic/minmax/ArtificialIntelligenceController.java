@@ -16,7 +16,7 @@ public class ArtificialIntelligenceController {
     private GameController gameController;
     private GameBoard gameBoard;
 
-    private int calculationDepth = 5;
+    private int calculationDepth = 3;
     private boolean aiEnabled = true;
     private Color aiColor = Color.BLACK;
 
