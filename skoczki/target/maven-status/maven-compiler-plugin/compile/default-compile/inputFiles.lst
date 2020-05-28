@@ -1,0 +1,17 @@
+E:\Java\SpringBoot\SI-labMin-MaxSkoczki\szkoczki\src\main\java\pl\pp\skoczki\SkoczkiLogic\minmax\SimulatedGameBoard.java
+E:\Java\SpringBoot\SI-labMin-MaxSkoczki\szkoczki\src\main\java\pl\pp\skoczki\SkoczkiLogic\configuration\ImageIoCContainer.java
+E:\Java\SpringBoot\SI-labMin-MaxSkoczki\szkoczki\src\main\java\pl\pp\skoczki\SkoczkiLogic\game\pawn\Position.java
+E:\Java\SpringBoot\SI-labMin-MaxSkoczki\szkoczki\src\main\java\pl\pp\skoczki\SkoczkiLogic\configuration\GameControllerConfiguration.java
+E:\Java\SpringBoot\SI-labMin-MaxSkoczki\szkoczki\src\main\java\pl\pp\skoczki\SkoczkiLogic\configuration\MoveArbiterConfiguration.java
+E:\Java\SpringBoot\SI-labMin-MaxSkoczki\szkoczki\src\main\java\pl\pp\skoczki\SkoczkiLogic\game\pawn\Pawn.java
+E:\Java\SpringBoot\SI-labMin-MaxSkoczki\szkoczki\src\main\java\pl\pp\skoczki\SkoczkiLogic\game\GameController.java
+E:\Java\SpringBoot\SI-labMin-MaxSkoczki\szkoczki\src\main\java\pl\pp\skoczki\SkoczkiLogic\MainTest.java
+E:\Java\SpringBoot\SI-labMin-MaxSkoczki\szkoczki\src\main\java\pl\pp\skoczki\SkoczkiLogic\game\board\Board.java
+E:\Java\SpringBoot\SI-labMin-MaxSkoczki\szkoczki\src\main\java\pl\pp\skoczki\SkoczkiLogic\game\board\MoveArbiter.java
+E:\Java\SpringBoot\SI-labMin-MaxSkoczki\szkoczki\src\main\java\pl\pp\skoczki\SkoczkiLogic\minmax\ArtificialIntelligenceController.java
+E:\Java\SpringBoot\SI-labMin-MaxSkoczki\szkoczki\src\main\java\pl\pp\skoczki\SkoczkiLogic\game\pawn\Color.java
+E:\Java\SpringBoot\SI-labMin-MaxSkoczki\szkoczki\src\main\java\pl\pp\skoczki\SkoczkiLogic\configuration\BoardConfiguration.java
+E:\Java\SpringBoot\SI-labMin-MaxSkoczki\szkoczki\src\main\java\pl\pp\skoczki\SkoczkiLogic\configuration\PawnConfiguration.java
+E:\Java\SpringBoot\SI-labMin-MaxSkoczki\szkoczki\src\main\java\pl\pp\skoczki\SkoczkiLogic\configuration\PossibleMoveConfiguration.java
+E:\Java\SpringBoot\SI-labMin-MaxSkoczki\szkoczki\src\main\java\pl\pp\skoczki\SkoczkiLogic\configuration\ConfigConstants.java
+E:\Java\SpringBoot\SI-labMin-MaxSkoczki\szkoczki\src\main\java\pl\pp\skoczki\SkoczkiLogic\game\board\GameBoard.java

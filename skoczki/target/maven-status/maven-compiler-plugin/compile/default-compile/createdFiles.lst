@@ -1,0 +1,17 @@
+pl\pp\skoczki\SkoczkiLogic\game\board\Board.class
+pl\pp\skoczki\SkoczkiLogic\configuration\ConfigConstants.class
+pl\pp\skoczki\SkoczkiLogic\configuration\BoardConfiguration.class
+pl\pp\skoczki\SkoczkiLogic\minmax\ArtificialIntelligenceController.class
+pl\pp\skoczki\SkoczkiLogic\minmax\SimulatedGameBoard.class
+pl\pp\skoczki\SkoczkiLogic\game\pawn\Position.class
+pl\pp\skoczki\SkoczkiLogic\game\pawn\Pawn.class
+pl\pp\skoczki\SkoczkiLogic\game\GameController.class
+pl\pp\skoczki\SkoczkiLogic\game\board\GameBoard.class
+pl\pp\skoczki\SkoczkiLogic\MainTest.class
+pl\pp\skoczki\SkoczkiLogic\game\pawn\Color.class
+pl\pp\skoczki\SkoczkiLogic\configuration\PawnConfiguration.class
+pl\pp\skoczki\SkoczkiLogic\configuration\ImageIoCContainer.class
+pl\pp\skoczki\SkoczkiLogic\configuration\GameControllerConfiguration.class
+pl\pp\skoczki\SkoczkiLogic\configuration\MoveArbiterConfiguration.class
+pl\pp\skoczki\SkoczkiLogic\game\board\MoveArbiter.class
+pl\pp\skoczki\SkoczkiLogic\configuration\PossibleMoveConfiguration.class
