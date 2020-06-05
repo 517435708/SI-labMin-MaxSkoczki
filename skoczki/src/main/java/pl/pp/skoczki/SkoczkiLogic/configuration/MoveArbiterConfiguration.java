@@ -12,7 +12,6 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.bind.annotation.RequestParam;
 import pl.pp.skoczki.SkoczkiLogic.game.GameController;
 import pl.pp.skoczki.SkoczkiLogic.game.board.MoveArbiter;
 import pl.pp.skoczki.SkoczkiLogic.game.pawn.Color;
@@ -21,7 +20,6 @@ import pl.pp.skoczki.SkoczkiLogic.game.pawn.Position;
 import pl.pp.skoczki.SkoczkiLogic.minmax.ArtificialIntelligenceController;
 
 import javax.annotation.Resource;
-import javax.annotation.Resources;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.Optional;
