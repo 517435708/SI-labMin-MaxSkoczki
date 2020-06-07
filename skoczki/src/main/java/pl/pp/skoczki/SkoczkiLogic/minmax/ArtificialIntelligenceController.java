@@ -1,5 +1,6 @@
 package pl.pp.skoczki.SkoczkiLogic.minmax;
 
+import javafx.geometry.Pos;
 import javafx.util.Pair;
 import org.springframework.stereotype.Component;
 import pl.pp.skoczki.SkoczkiLogic.game.GameController;
@@ -9,6 +10,7 @@ import pl.pp.skoczki.SkoczkiLogic.game.pawn.Pawn;
 import pl.pp.skoczki.SkoczkiLogic.game.pawn.Position;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class ArtificialIntelligenceController {
@@ -16,9 +18,12 @@ public class ArtificialIntelligenceController {
     private GameController gameController;
     private GameBoard gameBoard;
 
-    private int calculationDepth = 5;
+    private int calculationDepth = 15;
     private boolean aiEnabled = true;
     private Color aiColor = Color.BLACK;
+
+    Pair<Position, Position> bestMove;
+
 
     ArtificialIntelligenceController(GameController gameController,
                                      GameBoard gameBoard) {
@@ -30,174 +35,183 @@ public class ArtificialIntelligenceController {
         if (aiEnabled && gameController.getColorWhoseMoveIsThis()
                                        .equals(aiColor)) {
 
-            SimulatedGameBoard bestBoard = buildTree(calculationDepth,
-                                                     aiColor,
-                                                     new SimulatedGameBoard(gameBoard),
-                                                     Integer.MIN_VALUE,
-                                                     Integer.MAX_VALUE);
-            Pair<Pawn, Position> move = bestBoard.getMove();
-            gameController.move(move.getKey(), move.getValue());
+            List<Position> whitePositions = gameBoard.getPawns()
+                                                     .stream()
+                                                     .filter(p -> p.getColor()
+                                                                   .equals(Color.WHITE))
+                                                     .map(Pawn::getPosition)
+                                                     .collect(Collectors.toList());
+            List<Position> blackPositions = gameBoard.getPawns()
+                                                     .stream()
+                                                     .filter(p -> p.getColor()
+                                                                   .equals(Color.BLACK))
+                                                     .map(Pawn::getPosition)
+                                                     .collect(
+                                                             Collectors.toList());
 
+            buildTree(calculationDepth,
+                      aiColor,
+                      whitePositions,
+                      blackPositions,
+                      Integer.MIN_VALUE,
+                      Integer.MAX_VALUE);
+
+
+            gameController.move(bestMove.getKey(), bestMove.getValue());
             return true;
         }
         return false;
     }
 
-    private SimulatedGameBoard buildTree(int depth,
-                                         Color color,
-                                         SimulatedGameBoard simulatedBoard,
-                                         int alpha,
-                                         int betha) {
+    private int buildTree(int depth,
+                          Color color,
+                          List<Position> whitePositions,
+                          List<Position> blackPositions,
+                          int alpha,
+                          int betha) {
 
 
-        List<SimulatedGameBoard> simulatedGameBoards = generateBoardForEachPawn(simulatedBoard,
-                                                                                color);
-        if (depth == 0 || simulatedGameBoards.isEmpty()) {
-            if (color.equals(Color.WHITE)) {
-                return simulatedGameBoards.stream()
-                                          .max(Comparator.comparingInt(SimulatedGameBoard::getBoardValue))
-                                          .orElseThrow();
-
-            } else {
-                return simulatedGameBoards.stream()
-                                          .min(Comparator.comparingInt(SimulatedGameBoard::getBoardValue))
-                                          .orElseThrow();
-            }
+        if (depth == 0) {
+            return valueOfBoard(whitePositions, blackPositions);
         }
 
-        SimulatedGameBoard bestBoard = null;
+
+        List<Pair<Position, Position>> moves;
+        if (color.equals(Color.WHITE)) {
+            moves = generateMovesPerPositions(whitePositions, blackPositions);
+            moves.sort(Comparator.comparingInt(m -> (m.getValue()
+                                                      .getY() - m.getKey()
+                                                                 .getY())));
+        } else {
+            moves = generateMovesPerPositions(blackPositions, whitePositions);
+            moves.sort((m1, m2) -> (m2.getValue().getY() - m2.getKey().getY()) - (m1.getValue().getY() - m1.getKey().getY()));
+        }
+
 
         if (color.equals(Color.BLACK)) {
-            int best = Integer.MIN_VALUE;
-            for (var board : simulatedGameBoards) {
-                SimulatedGameBoard root = buildTree(depth - 1, Color.swap(color), board, alpha, betha);
-                if (root.getBoardValue() > best) {
-                    best = root.getBoardValue();
-                    bestBoard = board;
+            int buffer = alpha;
+            for (var move : moves) {
+                blackPositions.remove(move.getKey());
+                blackPositions.add(move.getValue());
+                alpha = Math.max(alpha, buildTree(depth - 1, Color.swap(color), whitePositions, blackPositions, alpha, betha));
+                if (buffer != alpha) {
+                    if (depth == calculationDepth)
+                        bestMove = move;
+                    buffer = alpha;
                 }
-                if (alpha < root.getBoardValue()) {
-                    alpha = root.getBoardValue();
-                }
-                if (betha <= alpha) {
+                if (alpha >= betha) {
                     break;
                 }
+                blackPositions.remove(move.getValue());
+                blackPositions.add(move.getKey());
             }
-            return bestBoard;
+            return alpha;
         } else {
-            int best = Integer.MAX_VALUE;
-            for (var board : simulatedGameBoards) {
-                SimulatedGameBoard root = buildTree(depth - 1, Color.swap(color), board, alpha, betha);
-                if (root.getBoardValue() < best) {
-                    best = root.getBoardValue();
-                    bestBoard = board;
+            int buffer = betha;
+            for (var move : moves) {
+                whitePositions.remove(move.getKey());
+                whitePositions.add(move.getValue());
+                betha = Math.min(betha, buildTree(depth - 1, Color.swap(color), whitePositions, blackPositions, alpha, betha));
+                if (buffer != betha) {
+                    if (depth == calculationDepth)
+                        bestMove = move;
+                    buffer = betha;
                 }
-                if (betha > root.getBoardValue()) {
-                    betha = root.getBoardValue();
-                }
-                if (betha <= alpha) {
+                if (alpha >= betha) {
                     break;
                 }
+                whitePositions.remove(move.getValue());
+                whitePositions.add(move.getKey());
             }
-            return bestBoard;
+            return betha;
         }
 
     }
 
-    private List<SimulatedGameBoard> generateBoardForEachPawn(SimulatedGameBoard simulatedGameBoard,
-                                                              Color simulatedPawnsOfColor) {
-
-        List<Pawn> pawns = simulatedGameBoard.getSimulatedPawnsOfColor(simulatedPawnsOfColor);
-        Map<Pawn, List<Position>> possibleMovesByPawn = new HashMap<>();
-
-        for (var pawn : pawns) {
-            possibleMovesByPawn.put(pawn, simulatedGameBoard.returnPossibleMovesForPawn(pawn));
+    private int valueOfBoard(List<Position> whitePositions, List<Position> blackPositions) {
+        int sum = 0;
+        for (var pos : whitePositions) {
+            sum += pos.getY();
+        }
+        for (var pos : blackPositions) {
+            sum += pos.getY();
         }
 
-        List<SimulatedGameBoard> boardsForEachPawn = new ArrayList<>();
-        for (var entry : possibleMovesByPawn.entrySet()) {
-            List<SimulatedGameBoard> allBoards = getBoardsForEntry(entry, simulatedGameBoard);
-            boardsForEachPawn.addAll(allBoards);
-        }
-
-        return boardsForEachPawn;
+        return sum;
     }
 
-    private List<SimulatedGameBoard> getBoardsForEntry(Map.Entry<Pawn, List<Position>> entry,
-                                                       SimulatedGameBoard rootBoard) {
 
-        List<SimulatedGameBoard> simulatedGameBoards = new ArrayList<>();
-        for (var position : entry.getValue()) {
-            Pawn pawn = entry.getKey();
-            List<Pawn> pawns = copyPawns(pawn, position, rootBoard.getSimulatedPawns());
+    private List<Pair<Position, Position>> generateMovesPerPositions(List<Position> whoseMoving,
+                                                                     List<Position> rest) {
 
-            SimulatedGameBoard simulatedGameBoard = new SimulatedGameBoard();
-            simulatedGameBoard.setSimulatedPawns(pawns);
-            simulatedGameBoard.setMove(pawn, position);
-            simulatedGameBoard.calculateValue();
-
-            simulatedGameBoards.add(simulatedGameBoard);
-        }
-
-
-        return simulatedGameBoards;
-    }
-
-    private List<Pawn> copyPawns(Pawn pawn,
-                                 Position position,
-                                 List<Pawn> simulatedPawns) {
-        Pawn pawnCopy = new Pawn(pawn);
-        pawnCopy.setPosition(position);
-
-        List<Pawn> pawns = new ArrayList<>(simulatedPawns);
-
-        pawns.remove(pawn);
-        pawns.add(pawnCopy);
-
-        return pawns;
-    }
-
-    private SimulatedGameBoard getBestBoard(Map.Entry<Pawn, List<Position>> entry,
-                                            SimulatedGameBoard rootBoard) {
-        List<SimulatedGameBoard> simulatedGameBoards = new ArrayList<>();
-        for (var position : entry.getValue()) {
-            Pawn pawn = entry.getKey();
-            Position positionBuffer = pawn.getPosition();
-            pawn.setPosition(position);
-            List<Pawn> pawns = new ArrayList<>(rootBoard.getSimulatedPawns());
-            pawn.setPosition(positionBuffer);
-            SimulatedGameBoard simulatedGameBoard = new SimulatedGameBoard();
-            simulatedGameBoard.setSimulatedPawns(pawns);
-            simulatedGameBoard.setMove(pawn, position);
-            simulatedGameBoard.calculateValue();
-
-            simulatedGameBoards.add(simulatedGameBoard);
-        }
-
-        int bestValue = deduceWorstValue();
-        SimulatedGameBoard bestBoard = rootBoard;
-
-        for (var board : simulatedGameBoards) {
-            if (deduce(board.getBoardValue(), bestValue) > 0) {
-                bestBoard = board;
+        List<Pair<Position, Position>> moves = new ArrayList<>();
+        for (var pos : whoseMoving) {
+            List<Position> possibleMoves = generateMoves(pos, rest, whoseMoving);
+            for (var move : possibleMoves) {
+                moves.add(new Pair<>(pos, move));
             }
         }
 
-        return bestBoard;
+        return moves;
     }
 
-    private int deduce(int boardValue, int bestValue) {
-        if (aiColor.equals(Color.WHITE)) {
-            return boardValue - bestValue;
+    private List<Position> generateMoves(Position pos,
+                                         List<Position> rest,
+                                         List<Position> whoseMoving) {
+        Queue<Position> positions = new LinkedList<>();
+        List<Position> availablePositions = getPositionsNotOccupied(pos, rest, whoseMoving);
+
+        positions.add(pos);
+        List<Position> theAnswerOfJumps = new ArrayList<>();
+
+        while (!positions.isEmpty()) {
+            Position position = positions.poll();
+            theAnswerOfJumps.add(position);
+            List<Position> jumpPositions = getPossibleToJumpPositions(position, rest, whoseMoving).stream()
+                                                                                                  .filter(p -> isAreaEmpty(
+                                                                                                          p,
+                                                                                                          rest,
+                                                                                                          whoseMoving))
+                                                                                                  .collect(Collectors.toList());
+            jumpPositions.stream()
+                         .filter(p -> !theAnswerOfJumps.contains(p))
+                         .forEach(positions::add);
         }
-        return bestValue - boardValue;
+        theAnswerOfJumps.addAll(availablePositions);
+        theAnswerOfJumps.remove(pos);
+        return theAnswerOfJumps;
     }
 
-    private int deduceWorstValue() {
-        if (aiColor.equals(Color.WHITE)) {
-            return -104;
+    private List<Position> getPossibleToJumpPositions(Position position, List<Position> pos1, List<Position> pos2) {
+
+        List<Position> jumpPositions = new ArrayList<>();
+
+        position.getNearPositions()
+                .stream()
+                .filter(p -> !isAreaEmpty(p, pos1, pos2))
+                .forEach(neighbour -> calculateJumpPosition(position, neighbour).ifPresent(jumpPositions::add));
+
+        return jumpPositions;
+    }
+
+    private boolean isAreaEmpty(Position position, List<Position> positions, List<Position> positionsSecond) {
+        return positions.stream()
+                        .noneMatch(p -> p == position) && positionsSecond.stream()
+                                                                         .noneMatch(p -> p == position);
+    }
+
+    private Optional<Position> calculateJumpPosition(Position root, Position neighbour) {
+        return Position.intToPosition(2 * neighbour.getX() - root.getX(), 2 * neighbour.getY() - root.getY());
+    }
+
+
+    private List<Position> getPositionsNotOccupied(Position pos, List<Position> rest, List<Position> whoseMoving) {
+        List<Position> positions = new ArrayList<>();
+        for (var nearPos : pos.getNearPositions()) {
+            if (!rest.contains(nearPos) && !whoseMoving.contains(nearPos)) {
+                positions.add(nearPos);
+            }
         }
-        return 104;
+        return positions;
     }
-
-
 }

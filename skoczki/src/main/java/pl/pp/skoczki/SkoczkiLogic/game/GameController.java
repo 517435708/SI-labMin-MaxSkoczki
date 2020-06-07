@@ -11,6 +11,7 @@ import pl.pp.skoczki.SkoczkiLogic.game.pawn.Position;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static pl.pp.skoczki.SkoczkiLogic.configuration.ConfigConstants.IMAGE_WIDTH;
@@ -39,6 +40,12 @@ public class GameController {
     public List<Position> getPositionsForPawn(Pawn pawn) {
         return gameBoard.returnPossibleMovesForPawn(pawn);
     }
+
+    public Color move(Position reference, Position position) {
+        Pawn pawn = pawns.stream().filter(p -> p.getPosition() == reference).findFirst().orElseThrow();
+        return move(pawn,position);
+    }
+
 
     public Color move(Pawn reference, Position position) {
 
