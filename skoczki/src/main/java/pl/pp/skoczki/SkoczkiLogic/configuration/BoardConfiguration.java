@@ -5,17 +5,17 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.ToolBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
-import pl.pp.skoczki.SkoczkiLogic.game.board.MoveArbiter;
-import pl.pp.skoczki.SkoczkiLogic.game.pawn.Color;
 import pl.pp.skoczki.SkoczkiLogic.game.pawn.Pawn;
 import pl.pp.skoczki.SkoczkiLogic.game.pawn.Position;
 
@@ -23,12 +23,23 @@ import javax.annotation.Resource;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static pl.pp.skoczki.SkoczkiLogic.configuration.ConfigConstants.*;
+
+
 
 @Configuration
 @DependsOn("normalPawnList")
 public class BoardConfiguration {
+
+    @Bean(name = "isHumanPlaying")
+    public boolean isHumanPlaying(){
+        return true;
+    }
+
+    @Resource(name = "isHumanPlaying")
+    private boolean isHumanPlaying;
 
     @Resource(name = "normalPawnList")
     private List<Pawn> pawns;
@@ -133,19 +144,29 @@ public class BoardConfiguration {
         toolBar.getItems()
                .add(label);
 
-        Button siVsSi = new Button("SI vs SI");
-        toolBar.getItems()
-               .add(siVsSi);
 
         Button siVsHuman = new Button("SI vs Human");
+
         toolBar.getItems()
                .add(siVsHuman);
+        Button siVsSi = new Button("SI vs SI");
+        siVsSi.setOnAction(e ->{
+            isHumanPlaying = false;
+            isHumanPlaying();
+        });
+        siVsSi.setOnAction(e ->{
+            isHumanPlaying = true;
+            isHumanPlaying();
+        });
+        toolBar.getItems()
+                .add(siVsSi);
 
         Label turn = new Label("Whose turn is this: ");
         toolBar.getItems()
                .add(turn);
 
         ImageView imageBuffer = turnImage();
+
 
         StackPane imageContainer = new StackPane();
 
@@ -158,6 +179,24 @@ public class BoardConfiguration {
         imageContainer.getChildren().addAll(rectangle, imageBuffer);
 
         toolBar.getItems().add(imageContainer);
+
+        Label algorithmDepthLabel = new Label("Algorithm Depth :");
+        toolBar.getItems().add(algorithmDepthLabel);
+
+        TextArea textArea = new TextArea("15");
+        textArea.setPrefHeight(16);
+        toolBar.getItems().add(textArea);
+
+        Button setDepth = new Button("Set depth");
+        toolBar.getItems()
+                .add(setDepth);
+        Button changeColor = new Button("Change your color");
+        changeColor.setOnAction(e ->{
+
+        });
+        toolBar.getItems()
+                .add(changeColor);
+
         toolBar.setOrientation(Orientation.VERTICAL);
         return toolBar;
     }

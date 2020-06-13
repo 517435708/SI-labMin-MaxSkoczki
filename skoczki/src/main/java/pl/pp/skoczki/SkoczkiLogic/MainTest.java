@@ -9,10 +9,6 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationContext;
 
 
-/**
- *
- * @author Konrad
- */
 
 
 @SpringBootApplication

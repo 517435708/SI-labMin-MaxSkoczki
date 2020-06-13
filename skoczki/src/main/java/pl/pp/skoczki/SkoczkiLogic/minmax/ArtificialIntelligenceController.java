@@ -2,25 +2,37 @@ package pl.pp.skoczki.SkoczkiLogic.minmax;
 
 import javafx.geometry.Pos;
 import javafx.util.Pair;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
+import pl.pp.skoczki.SkoczkiLogic.configuration.BoardConfiguration;
 import pl.pp.skoczki.SkoczkiLogic.game.GameController;
 import pl.pp.skoczki.SkoczkiLogic.game.board.GameBoard;
 import pl.pp.skoczki.SkoczkiLogic.game.pawn.Color;
 import pl.pp.skoczki.SkoczkiLogic.game.pawn.Pawn;
 import pl.pp.skoczki.SkoczkiLogic.game.pawn.Position;
 
+import javax.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
-public class ArtificialIntelligenceController {
+@Getter
+@Setter
+public class ArtificialIntelligenceController{
 
+    private static ApplicationContext context;
     private GameController gameController;
     private GameBoard gameBoard;
 
     private int calculationDepth = 15;
     private boolean aiEnabled = true;
     private Color aiColor = Color.BLACK;
+    @Resource(name = "isHumanPlaying")
+            boolean isHumanPlaying;
 
     Pair<Position, Position> bestMove;
 
@@ -130,8 +142,15 @@ public class ArtificialIntelligenceController {
 
     private int valueOfBoard(List<Position> whitePositions, List<Position> blackPositions) {
         int sum = 0;
+        int tempValue = 0;
         for (var pos : whitePositions) {
-            sum += pos.getY();
+            tempValue = pos.getY();
+            if(tempValue < 3)
+                sum += tempValue - 3;
+            else if(tempValue > 6)
+                sum += tempValue + 3;
+            else
+                sum += pos.getY();
         }
         for (var pos : blackPositions) {
             sum += pos.getY();
@@ -190,7 +209,7 @@ public class ArtificialIntelligenceController {
                 .stream()
                 .filter(p -> !isAreaEmpty(p, pos1, pos2))
                 .forEach(neighbour -> calculateJumpPosition(position, neighbour).ifPresent(jumpPositions::add));
-
+        //jumpPositions.removeIf(p -> p.y < position.y);
         return jumpPositions;
     }
 
