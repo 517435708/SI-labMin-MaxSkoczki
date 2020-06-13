@@ -11,13 +11,16 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import pl.pp.skoczki.SkoczkiLogic.game.GameController;
 import pl.pp.skoczki.SkoczkiLogic.game.pawn.Pawn;
 import pl.pp.skoczki.SkoczkiLogic.game.pawn.Position;
+import pl.pp.skoczki.SkoczkiLogic.minmax.ArtificialIntelligenceController;
 
 import javax.annotation.Resource;
 import java.io.FileInputStream;
@@ -33,13 +36,6 @@ import static pl.pp.skoczki.SkoczkiLogic.configuration.ConfigConstants.*;
 @DependsOn("normalPawnList")
 public class BoardConfiguration {
 
-    @Bean(name = "isHumanPlaying")
-    public boolean isHumanPlaying(){
-        return true;
-    }
-
-    @Resource(name = "isHumanPlaying")
-    private boolean isHumanPlaying;
 
     @Resource(name = "normalPawnList")
     private List<Pawn> pawns;
@@ -147,16 +143,16 @@ public class BoardConfiguration {
 
         Button siVsHuman = new Button("SI vs Human");
 
+
+        siVsHuman.setOnAction(e ->{
+            ArtificialIntelligenceController.setIsHumanPlaying(Boolean.TRUE);
+        });
+
         toolBar.getItems()
                .add(siVsHuman);
         Button siVsSi = new Button("SI vs SI");
         siVsSi.setOnAction(e ->{
-            isHumanPlaying = false;
-            isHumanPlaying();
-        });
-        siVsSi.setOnAction(e ->{
-            isHumanPlaying = true;
-            isHumanPlaying();
+            ArtificialIntelligenceController.setIsHumanPlaying(Boolean.FALSE);
         });
         toolBar.getItems()
                 .add(siVsSi);
@@ -173,8 +169,8 @@ public class BoardConfiguration {
         Rectangle rectangle = new Rectangle();
         rectangle.setWidth(IMAGE_WIDTH + 10);
         rectangle.setHeight(IMAGE_WIDTH + 10);
-        rectangle.setFill(javafx.scene.paint.Color.BROWN);
-        rectangle.setStroke(javafx.scene.paint.Color.BROWN);
+        rectangle.setFill(Color.BROWN);
+        rectangle.setStroke(Color.BROWN);
 
         imageContainer.getChildren().addAll(rectangle, imageBuffer);
 
@@ -188,11 +184,16 @@ public class BoardConfiguration {
         toolBar.getItems().add(textArea);
 
         Button setDepth = new Button("Set depth");
+        setDepth.setOnAction(e ->{
+            ArtificialIntelligenceController.setCalculationDepth(Integer.parseInt(textArea.getText()));
+        });
         toolBar.getItems()
                 .add(setDepth);
         Button changeColor = new Button("Change your color");
         changeColor.setOnAction(e ->{
-
+            ArtificialIntelligenceController.swapAiColor();
+            ArtificialIntelligenceController.commit();
+            GameController.swapColors();
         });
         toolBar.getItems()
                 .add(changeColor);

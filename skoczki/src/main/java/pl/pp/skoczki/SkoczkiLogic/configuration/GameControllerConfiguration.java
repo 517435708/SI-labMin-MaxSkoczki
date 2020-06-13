@@ -15,6 +15,7 @@ import java.util.List;
 @Configuration
 public class GameControllerConfiguration {
 
+
     @Resource(name = "normalPawnList")
     List<Pawn> pawns;
 
@@ -36,6 +37,7 @@ public class GameControllerConfiguration {
         return gameController;
     }
 
+
     private void registerOnClickMethodForPawns(GameController gameController) {
         for (var pawn : pawns) {
             ImageView imageView = pawn.getPawnImage();
@@ -49,8 +51,8 @@ public class GameControllerConfiguration {
                     gameController.getSelectedPawn().ifPresent(p -> p.setSelected(false));
                     pawn.setSelected(true);
                     gameController.getPositionsForPawn(pawn)
-                                  .forEach(position -> position.getImageViewPosition()
-                                                               .setVisible(true));
+                            .forEach(position -> position.getImageViewPosition()
+                                    .setVisible(true));
                 }
 
             });

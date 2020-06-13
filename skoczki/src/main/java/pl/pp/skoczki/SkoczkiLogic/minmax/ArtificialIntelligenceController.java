@@ -1,40 +1,33 @@
 package pl.pp.skoczki.SkoczkiLogic.minmax;
 
-import javafx.geometry.Pos;
 import javafx.util.Pair;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
-import pl.pp.skoczki.SkoczkiLogic.configuration.BoardConfiguration;
 import pl.pp.skoczki.SkoczkiLogic.game.GameController;
+import pl.pp.skoczki.SkoczkiLogic.game.board.Board;
 import pl.pp.skoczki.SkoczkiLogic.game.board.GameBoard;
 import pl.pp.skoczki.SkoczkiLogic.game.pawn.Color;
 import pl.pp.skoczki.SkoczkiLogic.game.pawn.Pawn;
 import pl.pp.skoczki.SkoczkiLogic.game.pawn.Position;
 
-import javax.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
 @Getter
 @Setter
-public class ArtificialIntelligenceController{
+public class ArtificialIntelligenceController {
+    private static GameController gameController;
+    private static GameBoard gameBoard;
 
-    private static ApplicationContext context;
-    private GameController gameController;
-    private GameBoard gameBoard;
+    private static int calculationDepth = 15;
+    private static boolean aiEnabled = true;
+    private static Color aiColor = Color.BLACK;
+    private static Boolean isHumanPlaying = Boolean.TRUE;
+    private static Color humanColor = Color.WHITE;
 
-    private int calculationDepth = 15;
-    private boolean aiEnabled = true;
-    private Color aiColor = Color.BLACK;
-    @Resource(name = "isHumanPlaying")
-            boolean isHumanPlaying;
-
-    Pair<Position, Position> bestMove;
+    static Pair<Position, Position> bestMove;
 
 
     ArtificialIntelligenceController(GameController gameController,
@@ -43,30 +36,45 @@ public class ArtificialIntelligenceController{
         this.gameBoard = gameBoard;
     }
 
-    public boolean commit() {
-        if (aiEnabled && gameController.getColorWhoseMoveIsThis()
-                                       .equals(aiColor)) {
+    public static void setIsHumanPlaying(Boolean aFalse) {
+        isHumanPlaying = aFalse;
+    }
+
+    public static void setCalculationDepth(int cd){
+        calculationDepth = cd;
+    }
+
+    public static void swapAiColor(){
+        if(aiColor == Color.WHITE)
+            aiColor = Color.BLACK;
+        else
+            aiColor = Color.WHITE;
+    }
+
+    public static boolean commit() {
+        if ((aiEnabled && gameController.getColorWhoseMoveIsThis()
+                .equals(aiColor)) || !isHumanPlaying) {
 
             List<Position> whitePositions = gameBoard.getPawns()
-                                                     .stream()
-                                                     .filter(p -> p.getColor()
-                                                                   .equals(Color.WHITE))
-                                                     .map(Pawn::getPosition)
-                                                     .collect(Collectors.toList());
+                    .stream()
+                    .filter(p -> p.getColor()
+                            .equals(Color.WHITE))
+                    .map(Pawn::getPosition)
+                    .collect(Collectors.toList());
             List<Position> blackPositions = gameBoard.getPawns()
-                                                     .stream()
-                                                     .filter(p -> p.getColor()
-                                                                   .equals(Color.BLACK))
-                                                     .map(Pawn::getPosition)
-                                                     .collect(
-                                                             Collectors.toList());
+                    .stream()
+                    .filter(p -> p.getColor()
+                            .equals(Color.BLACK))
+                    .map(Pawn::getPosition)
+                    .collect(
+                            Collectors.toList());
 
             buildTree(calculationDepth,
-                      aiColor,
-                      whitePositions,
-                      blackPositions,
-                      Integer.MIN_VALUE,
-                      Integer.MAX_VALUE);
+                    gameController.getColorWhoseMoveIsThis(),
+                    whitePositions,
+                    blackPositions,
+                    Integer.MIN_VALUE,
+                    Integer.MAX_VALUE);
 
 
             gameController.move(bestMove.getKey(), bestMove.getValue());
@@ -75,7 +83,7 @@ public class ArtificialIntelligenceController{
         return false;
     }
 
-    private int buildTree(int depth,
+    private static int buildTree(int depth,
                           Color color,
                           List<Position> whitePositions,
                           List<Position> blackPositions,
@@ -92,8 +100,8 @@ public class ArtificialIntelligenceController{
         if (color.equals(Color.WHITE)) {
             moves = generateMovesPerPositions(whitePositions, blackPositions);
             moves.sort(Comparator.comparingInt(m -> (m.getValue()
-                                                      .getY() - m.getKey()
-                                                                 .getY())));
+                    .getY() - m.getKey()
+                    .getY())));
         } else {
             moves = generateMovesPerPositions(blackPositions, whitePositions);
             moves.sort((m1, m2) -> (m2.getValue().getY() - m2.getKey().getY()) - (m1.getValue().getY() - m1.getKey().getY()));
@@ -140,14 +148,14 @@ public class ArtificialIntelligenceController{
 
     }
 
-    private int valueOfBoard(List<Position> whitePositions, List<Position> blackPositions) {
+    private static int valueOfBoard(List<Position> whitePositions, List<Position> blackPositions) {
         int sum = 0;
         int tempValue = 0;
         for (var pos : whitePositions) {
             tempValue = pos.getY();
-            if(tempValue < 3)
+            if (tempValue < 3)
                 sum += tempValue - 3;
-            else if(tempValue > 6)
+            else if (tempValue > 6)
                 sum += tempValue + 3;
             else
                 sum += pos.getY();
@@ -160,7 +168,7 @@ public class ArtificialIntelligenceController{
     }
 
 
-    private List<Pair<Position, Position>> generateMovesPerPositions(List<Position> whoseMoving,
+    private static List<Pair<Position, Position>> generateMovesPerPositions(List<Position> whoseMoving,
                                                                      List<Position> rest) {
 
         List<Pair<Position, Position>> moves = new ArrayList<>();
@@ -174,7 +182,7 @@ public class ArtificialIntelligenceController{
         return moves;
     }
 
-    private List<Position> generateMoves(Position pos,
+    private static List<Position> generateMoves(Position pos,
                                          List<Position> rest,
                                          List<Position> whoseMoving) {
         Queue<Position> positions = new LinkedList<>();
@@ -187,21 +195,21 @@ public class ArtificialIntelligenceController{
             Position position = positions.poll();
             theAnswerOfJumps.add(position);
             List<Position> jumpPositions = getPossibleToJumpPositions(position, rest, whoseMoving).stream()
-                                                                                                  .filter(p -> isAreaEmpty(
-                                                                                                          p,
-                                                                                                          rest,
-                                                                                                          whoseMoving))
-                                                                                                  .collect(Collectors.toList());
+                    .filter(p -> isAreaEmpty(
+                            p,
+                            rest,
+                            whoseMoving))
+                    .collect(Collectors.toList());
             jumpPositions.stream()
-                         .filter(p -> !theAnswerOfJumps.contains(p))
-                         .forEach(positions::add);
+                    .filter(p -> !theAnswerOfJumps.contains(p))
+                    .forEach(positions::add);
         }
         theAnswerOfJumps.addAll(availablePositions);
         theAnswerOfJumps.remove(pos);
         return theAnswerOfJumps;
     }
 
-    private List<Position> getPossibleToJumpPositions(Position position, List<Position> pos1, List<Position> pos2) {
+    private static List<Position> getPossibleToJumpPositions(Position position, List<Position> pos1, List<Position> pos2) {
 
         List<Position> jumpPositions = new ArrayList<>();
 
@@ -213,18 +221,18 @@ public class ArtificialIntelligenceController{
         return jumpPositions;
     }
 
-    private boolean isAreaEmpty(Position position, List<Position> positions, List<Position> positionsSecond) {
+    private static boolean isAreaEmpty(Position position, List<Position> positions, List<Position> positionsSecond) {
         return positions.stream()
-                        .noneMatch(p -> p == position) && positionsSecond.stream()
-                                                                         .noneMatch(p -> p == position);
+                .noneMatch(p -> p == position) && positionsSecond.stream()
+                .noneMatch(p -> p == position);
     }
 
-    private Optional<Position> calculateJumpPosition(Position root, Position neighbour) {
+    private static Optional<Position> calculateJumpPosition(Position root, Position neighbour) {
         return Position.intToPosition(2 * neighbour.getX() - root.getX(), 2 * neighbour.getY() - root.getY());
     }
 
 
-    private List<Position> getPositionsNotOccupied(Position pos, List<Position> rest, List<Position> whoseMoving) {
+    private static List<Position> getPositionsNotOccupied(Position pos, List<Position> rest, List<Position> whoseMoving) {
         List<Position> positions = new ArrayList<>();
         for (var nearPos : pos.getNearPositions()) {
             if (!rest.contains(nearPos) && !whoseMoving.contains(nearPos)) {

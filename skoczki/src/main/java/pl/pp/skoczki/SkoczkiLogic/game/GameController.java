@@ -21,7 +21,7 @@ public class GameController {
     private List<Pawn> pawns;
 
     @Getter
-    private Color colorWhoseMoveIsThis = Color.WHITE;
+    private static Color colorWhoseMoveIsThis = Color.WHITE;
     private GameBoard gameBoard;
 
     public GameController(GameBoard gameBoard,
@@ -70,7 +70,7 @@ public class GameController {
                     .findFirst();
     }
 
-    public void swapColors() {
+    public static void swapColors() {
         if (colorWhoseMoveIsThis.equals(Color.WHITE)) {
             colorWhoseMoveIsThis = Color.BLACK;
         } else {
