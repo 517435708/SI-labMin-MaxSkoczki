@@ -13,11 +13,13 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import pl.pp.skoczki.SkoczkiLogic.game.GameController;
+import pl.pp.skoczki.SkoczkiLogic.game.board.MoveArbiter;
 import pl.pp.skoczki.SkoczkiLogic.game.pawn.Pawn;
 import pl.pp.skoczki.SkoczkiLogic.game.pawn.Position;
 import pl.pp.skoczki.SkoczkiLogic.minmax.ArtificialIntelligenceController;
@@ -39,6 +41,9 @@ public class BoardConfiguration {
 
     @Resource(name = "normalPawnList")
     private List<Pawn> pawns;
+
+    @Autowired
+    private MoveArbiter moveArbiter;
 
     @Bean(name = "chessBoard")
     public Scene gamePanel() throws
@@ -153,6 +158,8 @@ public class BoardConfiguration {
         Button siVsSi = new Button("SI vs SI");
         siVsSi.setOnAction(e ->{
             ArtificialIntelligenceController.setIsHumanPlaying(Boolean.FALSE);
+            ArtificialIntelligenceController.commit();
+            moveArbiter.swap();
         });
         toolBar.getItems()
                 .add(siVsSi);
