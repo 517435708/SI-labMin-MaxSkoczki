@@ -45,10 +45,14 @@ public class ArtificialIntelligenceController {
     }
 
     public static void swapAiColor(){
-        if(aiColor == Color.WHITE)
+        if(aiColor == Color.WHITE) {
             aiColor = Color.BLACK;
-        else
+            humanColor = Color.WHITE;
+        }
+        else {
             aiColor = Color.WHITE;
+            humanColor = Color.BLACK;
+        }
     }
 
     public static boolean commit() {
@@ -240,5 +244,9 @@ public class ArtificialIntelligenceController {
             }
         }
         return positions;
+    }
+
+    public static Color getHumanColor() {
+        return humanColor;
     }
 }

@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import pl.pp.skoczki.SkoczkiLogic.game.GameController;
 import pl.pp.skoczki.SkoczkiLogic.game.board.GameBoard;
 import pl.pp.skoczki.SkoczkiLogic.game.pawn.Pawn;
+import pl.pp.skoczki.SkoczkiLogic.minmax.ArtificialIntelligenceController;
 
 import javax.annotation.Resource;
 
@@ -44,7 +45,7 @@ public class GameControllerConfiguration {
 
             imageView.setOnMouseClicked((MouseEvent e) -> {
 
-                if (pawn.getColor().equals(gameController.getColorWhoseMoveIsThis())) {
+                if (pawn.getColor().equals(gameController.getColorWhoseMoveIsThis()) && pawn.getColor().equals(ArtificialIntelligenceController.getHumanColor())) {
                     ioCContainer.resetSelections();
                     ioCContainer.moveSelection(pawn.getPosition());
 

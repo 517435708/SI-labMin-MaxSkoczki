@@ -141,7 +141,8 @@ public class BoardConfiguration {
         toolBar.setMaxWidth(TOOLBAR_WIDTH);
         toolBar.setPrefWidth(TOOLBAR_WIDTH);
 
-        Label label = new Label("New Game: ");
+
+        Label label = new Label("Game mode: ");
         toolBar.getItems()
                .add(label);
 
